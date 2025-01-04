@@ -91,7 +91,7 @@ class Creature(pygame.sprite.Sprite):
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Organs')
-    size = width, height = 600, 600
+    size = width, height = 524, 524
     screen = pygame.display.set_mode(size)
 
     all_sprites = pygame.sprite.Group()
