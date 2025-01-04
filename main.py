@@ -20,38 +20,93 @@ def load_image(name, colorkey=None):
     return image
 
 
-class Board:
+class Bedroom:
     def __init__(self, group):
         for i in range(400):
-            if i == 0:
+            if i == 0:  # левый верхний угол обоев (задняя стена)
                 image = load_image("Slice 122.png")
-            elif 0 < i < 19:
+            elif 0 < i < 19:  # верхний край стены (задняя стена)
                 image = load_image("Slice 124.png")
-            elif i == 19:
+            elif i == 19:  # правый верхний угол обоев (задняя стена)
                 image = load_image("Slice 126.png")
-            elif i == 120:
+            elif i == 120:  # правый нижний угол обоев (задняя стена)
                 image = load_image("Slice 128.png")
-            elif i == 380:
+            elif i == 380:  # левый нижний угол обоев (передняя стена)
                 image = load_image("Slice 142.png")
-            elif i == 399:
+            elif i == 399:  # правый нижний угол обоев (передняя стена)
                 image = load_image("Slice 146.png")
-            elif i % 10 == 9 and (i + 1) / 10 % 2 == 0 and 150 < i < 400:
-                image = load_image("Slice 136.png")
-            elif i / 10 % 2 == 0 and 120 < i < 400:
-                image = load_image("Slice 132.png")
-            elif i / 10 % 2 == 0:
-                image = load_image("Slice 133.png")
-            elif i == 139:
+            elif i == 139:  # правый нижний угол обоев (задняя стена)
                 image = load_image("Slice 130.png")
-            elif i % 10 == 9 and (i + 1) / 10 % 2 == 0 and 20 < i < 140:
+            elif i % 10 == 9 and (i + 1) / 10 % 2 == 0 and 150 < i < 400:  # правая стена рядом с полом
+                image = load_image("Slice 136.png")
+            elif i / 10 % 2 == 0 and 120 < i < 400:  # левая стена рядом с полом
+                image = load_image("Slice 132.png")
+            elif i / 10 % 2 == 0:  # левая стена рядом со стеной
+                image = load_image("Slice 133.png")
+            elif i % 10 == 9 and (i + 1) / 10 % 2 == 0 and 20 < i < 140:  # правая стена рядом со стеной
                 image = load_image("Slice 135.png")
-            elif i % 10 != 0 and 20 < i < 120:
+            elif i % 10 != 0 and 20 < i < 120:  # общий тон задней стены
                 image = load_image("Slice 129.png")
-            elif i % 10 != 0 and 120 < i < 140 and i != 130:
+            elif i % 10 != 0 and 120 < i < 140 and i != 130:  # нижний край стены (задняя стена)
                 image = load_image("Slice 134.png")
-            elif 380 < i < 399:
+            elif 380 < i < 399:  # нижний край стены (передняя стена)
                 image = load_image("Slice 144.png")
-            elif i % 10 != 0 and 140 < i < 400:
+            elif i % 10 != 0 and 140 < i < 400:  # пол
+                image = load_image("Slice 1.png")
+            # Расположение по x;
+            # (i // 10) столбец; * 24 расстояние между спрайтами в 24 пикселя (ширина одного спрайта); + 24 отступ
+            x = (i % 20) * 24 + 24
+            # Расположение по y;
+            # (i // 10) строка; * 24 расстояние между спрайтами в 24 пикселя (ширина одного спрайта); + 24 отступ
+            y = (i // 20) * 24 + 24
+            # создание и добавление спрайта в группу
+            sprite = pygame.sprite.Sprite()
+            sprite.image = image
+            sprite.rect = sprite.image.get_rect(topleft=(x, y))
+            group.add(sprite)
+        # Дверь
+        self.door_sprite = pygame.sprite.Sprite()
+        image = load_image('door.png')
+        self.door_sprite.image = image
+        self.door_sprite.rect = self.door_sprite.image.get_rect(topleft=(256, 100))
+        group.add(self.door_sprite)
+
+    def get_door_sprite(self):
+        return self.door_sprite
+
+
+class LvingRoom:
+    def __init__(self, group):
+        for i in range(400):
+            if i == 0:  # левый верхний угол обоев (задняя стена)
+                image = load_image("Slice 61.png")
+            elif 0 < i < 19:  # верхний край стены (задняя стена)
+                image = load_image("Slice 63.png")
+            elif i == 19:  # правый верхний угол обоев (задняя стена)
+                image = load_image("Slice 65.png")
+            elif i == 120:  # правый нижний угол обоев (задняя стена)
+                image = load_image("Slice 67.png")
+            elif i == 380:  # левый нижний угол обоев (передняя стена)
+                image = load_image("Slice 81.png")
+            elif i == 399:  # правый нижний угол обоев (передняя стена)
+                image = load_image("Slice 85.png")
+            elif i == 139:  # правый нижний угол обоев (задняя стена)
+                image = load_image("Slice 69.png")
+            elif i % 10 == 9 and (i + 1) / 10 % 2 == 0 and 150 < i < 400:  # правая стена рядом с полом
+                image = load_image("Slice 75.png")
+            elif i / 10 % 2 == 0 and 120 < i < 400:  # левая стена рядом с полом
+                image = load_image("Slice 71.png")
+            elif i / 10 % 2 == 0:  # левая стена рядом со стеной
+                image = load_image("Slice 72.png")
+            elif i % 10 == 9 and (i + 1) / 10 % 2 == 0 and 20 < i < 140:  # правая стена рядом со стеной
+                image = load_image("Slice 74.png")
+            elif i % 10 != 0 and 20 < i < 120:  # общий тон задней стены
+                image = load_image("Slice 68.png")
+            elif i % 10 != 0 and 120 < i < 140 and i != 130:  # нижний край стены (задняя стена)
+                image = load_image("Slice 73.png")
+            elif 380 < i < 399:  # нижний край стены (передняя стена)
+                image = load_image("Slice 83.png")
+            elif i % 10 != 0 and 140 < i < 400:  # пол
                 image = load_image("Slice 1.png")
             # Расположение по x;
             # (i // 10) столбец; * 24 расстояние между спрайтами в 24 пикселя (ширина одного спрайта); + 24 отступ
@@ -104,7 +159,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
 
     all_sprites = pygame.sprite.Group()
-    board = Board(all_sprites)
+    board = Bedroom(all_sprites)
     creature = Creature(all_sprites)
     FPS = 30
     clock = pygame.time.Clock()
@@ -127,7 +182,8 @@ if __name__ == '__main__':
             all_sprites.update((0, 10))
         if keys[pygame.K_e]:
             if creature.check_interaction_door(board.get_door_sprite()):
-                print("взаимодействует с дверью")
+                board = LvingRoom(all_sprites)
+                creature = Creature(all_sprites)
 
         all_sprites.draw(screen)
         pygame.display.flip()
