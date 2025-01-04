@@ -22,7 +22,6 @@ def load_image(name, colorkey=None):
 
 class Board:
     def __init__(self, group):
-
         for i in range(400):
             if i == 0:
                 image = load_image("Slice 122.png")
@@ -65,11 +64,15 @@ class Board:
             sprite.image = image
             sprite.rect = sprite.image.get_rect(topleft=(x, y))
             group.add(sprite)
-        sprite = pygame.sprite.Sprite()
+        # Дверь
+        self.door_sprite = pygame.sprite.Sprite()
         image = load_image('door.png')
-        sprite.image = image
-        sprite.rect = sprite.image.get_rect(topleft=(256, 100))
-        group.add(sprite)
+        self.door_sprite.image = image
+        self.door_sprite.rect = self.door_sprite.image.get_rect(topleft=(256, 100))
+        group.add(self.door_sprite)
+
+    def get_door_sprite(self):
+        return self.door_sprite
 
 
 class Creature(pygame.sprite.Sprite):
@@ -87,6 +90,12 @@ class Creature(pygame.sprite.Sprite):
             if 135 < self.rect.y + args[0][1] < 425:
                 self.rect.y += args[0][1]
 
+    def check_interaction_door(self, door_sprite):
+        # Проверяем, находится ли игрок рядом с дверью
+        if self.rect.colliderect(door_sprite.rect):
+            return True
+        return False
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -95,7 +104,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
 
     all_sprites = pygame.sprite.Group()
-    Board(all_sprites)
+    board = Board(all_sprites)
     creature = Creature(all_sprites)
     FPS = 30
     clock = pygame.time.Clock()
@@ -116,6 +125,10 @@ if __name__ == '__main__':
             all_sprites.update((0, -10))
         elif keys[pygame.K_s]:
             all_sprites.update((0, 10))
+        if keys[pygame.K_e]:
+            if creature.check_interaction_door(board.get_door_sprite()):
+                print("взаимодействует с дверью")
+
         all_sprites.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
