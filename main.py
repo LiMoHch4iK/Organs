@@ -77,12 +77,12 @@ class Creature(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = load_image("Idle Front.png")
         self.rect = self.image.get_rect()
-        self.rect.x = 30
-        self.rect.y = 135
+        self.rect.x = 200
+        self.rect.y = 205
 
     def update(self, *args):
         if args:
-            if 30 < self.rect.x + args[0][0] < 440:
+            if 30 < self.rect.x + args[0][0] < 436:
                 self.rect.x += args[0][0]
             if 135 < self.rect.y + args[0][1] < 425:
                 self.rect.y += args[0][1]
@@ -108,13 +108,13 @@ if __name__ == '__main__':
 
         keys = pygame.key.get_pressed()
         screen.fill('black')
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_a]:
             all_sprites.update((-10, 0))
-        elif keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_d]:
             all_sprites.update((10, 0))
-        elif keys[pygame.K_UP]:
+        elif keys[pygame.K_w]:
             all_sprites.update((0, -10))
-        elif keys[pygame.K_DOWN]:
+        elif keys[pygame.K_s]:
             all_sprites.update((0, 10))
         all_sprites.draw(screen)
         pygame.display.flip()
