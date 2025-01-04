@@ -54,8 +54,6 @@ class Board:
             elif i % 10 != 0 and 140 < i < 400:
                 image = load_image(f"Slice 1.png")
 
-
-
             # Расположение по x;
             # (i // 10) столбец; * 24 расстояние между спрайтами в 24 пикселя (ширина одного спрайта); + 24 отступ
             x = (i % 20) * 24 + 24
@@ -69,6 +67,22 @@ class Board:
             group.add(sprite)
 
 
+class Creature(pygame.sprite.Sprite):
+    def __init__(self, *group):
+        super().__init__(*group)
+        self.image = load_image("Idle Front.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = 30
+        self.rect.y = 135
+
+    def update(self, *args):
+        if args:
+            if 30 < self.rect.x + args[0][0] < 440:
+                self.rect.x += args[0][0]
+            if 135 < self.rect.y + args[0][1] < 425:
+                self.rect.y += args[0][1]
+
+
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Organs')
@@ -77,6 +91,9 @@ if __name__ == '__main__':
 
     all_sprites = pygame.sprite.Group()
     Board(all_sprites)
+    creature = Creature(all_sprites)
+    FPS = 30
+    clock = pygame.time.Clock()
 
     running = True
     while running:
@@ -84,9 +101,20 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
 
+        keys = pygame.key.get_pressed()
         screen.fill('black')
+        if keys[pygame.K_LEFT]:
+            all_sprites.update((-10, 0))
+        elif keys[pygame.K_RIGHT]:
+            all_sprites.update((10, 0))
+        elif keys[pygame.K_UP]:
+            all_sprites.update((0, -10))
+        elif keys[pygame.K_DOWN]:
+            all_sprites.update((0, 10))
+        all_sprites.draw(screen)
+        pygame.display.flip()
+        clock.tick(FPS)
         all_sprites.update()
         all_sprites.draw(screen)
         pygame.display.flip()
-
     pygame.quit()
