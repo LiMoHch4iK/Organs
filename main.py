@@ -75,7 +75,7 @@ class Bedroom:
         return self.door_sprite
 
 
-class LvingRoom:
+class LivingRoom:
     def __init__(self, group):
         for i in range(400):
             if i == 0:  # левый верхний угол обоев (задняя стена)
@@ -159,8 +159,15 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode(size)
 
     all_sprites = pygame.sprite.Group()
-    board = Bedroom(all_sprites)
-    creature = Creature(all_sprites)
+
+    # Создайте спальню и гостиную
+    living_room = LivingRoom(all_sprites)
+    bedroom = Bedroom(all_sprites)
+
+    current_room = bedroom
+    player = Creature()
+    all_sprites.add(player)
+
     FPS = 30
     clock = pygame.time.Clock()
 
@@ -172,6 +179,7 @@ if __name__ == '__main__':
 
         keys = pygame.key.get_pressed()
         screen.fill('black')
+
         if keys[pygame.K_a]:
             all_sprites.update((-10, 0))
         elif keys[pygame.K_d]:
@@ -180,15 +188,27 @@ if __name__ == '__main__':
             all_sprites.update((0, -10))
         elif keys[pygame.K_s]:
             all_sprites.update((0, 10))
-        if keys[pygame.K_e]:
-            if creature.check_interaction_door(board.get_door_sprite()):
-                board = LvingRoom(all_sprites)
-                creature = Creature(all_sprites)
 
-        all_sprites.draw(screen)
-        pygame.display.flip()
-        clock.tick(FPS)
+        if keys[pygame.K_e]:
+            # Проверяем взаимодействие с дверью
+            if player.rect.colliderect(current_room.get_door_sprite().rect):
+                # Переход в другую комнату
+                if current_room == bedroom:
+                    current_room = living_room
+                    all_sprites.empty()  # Очищаем группу спрайтов
+                    living_room.__init__(all_sprites)  # Инициализируем новую комнату
+                    all_sprites.add(player)  # Добавляем игрока в новую комнату
+                    player.rect.center = (270, 220)  # Устанавливаем позицию игрока
+                else:
+                    current_room = bedroom
+                    all_sprites.empty()  # Очищаем группу спрайтов
+                    bedroom.__init__(all_sprites)  # Инициализируем новую комнату
+                    all_sprites.add(player)  # Добавляем игрока в новую комнату
+                    player.rect.center = (270, 220)  # Устанавливаем позицию игрока
+
         all_sprites.update()
         all_sprites.draw(screen)
         pygame.display.flip()
+        clock.tick(FPS)
+
     pygame.quit()
