@@ -65,14 +65,14 @@ class Bedroom:
             sprite.rect = sprite.image.get_rect(topleft=(x, y))
             group.add(sprite)
         # Дверь
-        self.door_sprite = pygame.sprite.Sprite()
+        self.door1_sprite = pygame.sprite.Sprite()
         image = load_image('door.png')
-        self.door_sprite.image = image
-        self.door_sprite.rect = self.door_sprite.image.get_rect(topleft=(256, 100))
-        group.add(self.door_sprite)
+        self.door1_sprite.image = image
+        self.door1_sprite.rect = self.door1_sprite.image.get_rect(topleft=(200, 100))
+        group.add(self.door1_sprite)
 
     def get_door_sprite(self):
-        return self.door_sprite
+        return self.door1_sprite
 
 
 class LivingRoom:
@@ -104,8 +104,12 @@ class LivingRoom:
                 image = load_image("Slice 68.png")
             elif i % 10 != 0 and 120 < i < 140 and i != 130:  # нижний край стены (задняя стена)
                 image = load_image("Slice 73.png")
-            elif 380 < i < 399:  # нижний край стены (передняя стена)
+            elif i == 386:  # левый угол передней стены у двери
+                image = load_image("Slice 82.png")
+            elif 380 < i < 387 or 389 < i < 399:  # нижний край стены (передняя стена)
                 image = load_image("Slice 83.png")
+            elif i == 389:  # правый угол передней стены у двери
+                image = load_image("Slice 84.png")
             elif i % 10 != 0 and 140 < i < 400:  # пол
                 image = load_image("Slice 1.png")
             # Расположение по x;
@@ -119,15 +123,26 @@ class LivingRoom:
             sprite.image = image
             sprite.rect = sprite.image.get_rect(topleft=(x, y))
             group.add(sprite)
-        # Дверь
-        self.door_sprite = pygame.sprite.Sprite()
+        # Прошлая дверь
+        self.door_sprite1 = pygame.sprite.Sprite()
+        image = load_image('Slice 4.png')
+        self.door_sprite1.image = image
+        self.door_sprite1.rect = self.door_sprite1.image.get_rect(topleft=(192, 480))
+        group.add(self.door_sprite1)
+        self.door_sprite1 = pygame.sprite.Sprite()
+        image = load_image('Slice 4.png')
+        self.door_sprite1.image = image
+        self.door_sprite1.rect = self.door_sprite1.image.get_rect(topleft=(216, 480))
+        group.add(self.door_sprite1)
+        # Новая дверь
+        self.door_sprite2 = pygame.sprite.Sprite()
         image = load_image('door.png')
-        self.door_sprite.image = image
-        self.door_sprite.rect = self.door_sprite.image.get_rect(topleft=(256, 100))
-        group.add(self.door_sprite)
+        self.door_sprite2.image = image
+        self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(256, 100))
+        group.add(self.door_sprite2)
 
     def get_door_sprite(self):
-        return self.door_sprite
+        return self.door_sprite1
 
 
 class Creature(pygame.sprite.Sprite):
@@ -136,17 +151,24 @@ class Creature(pygame.sprite.Sprite):
         self.image = load_image("Idle Front.png")
         self.rect = self.image.get_rect()
         self.rect.x = 200
-        self.rect.y = 205
+        self.rect.y = 200
 
     def update(self, *args):
         if args:
-            if 30 < self.rect.x + args[0][0] < 436:
-                self.rect.x += args[0][0]
-            if 135 < self.rect.y + args[0][1] < 425:
-                self.rect.y += args[0][1]
+            if current_room == living_room and 170 < self.rect.x + args[0][0] < 205 and 400 < self.rect.y + args[0][
+                1] < 450:
+                if 170 < self.rect.x + args[0][0] < 205:
+                    self.rect.x += args[0][0]
+                if 400 < self.rect.y + args[0][1] < 450:
+                    self.rect.y += args[0][1]
+            else:
+                if 30 < self.rect.x + args[0][0] < 436 and 135 < self.rect.y + args[0][1] < 425:
+                    self.rect.x += args[0][0]
+                    self.rect.y += args[0][1]
 
     def check_interaction_door(self, door_sprite):
         # Проверяем, находится ли игрок рядом с дверью
+        # if комната
         if self.rect.colliderect(door_sprite.rect):
             return True
         return False
@@ -168,7 +190,7 @@ if __name__ == '__main__':
     player = Creature()
     all_sprites.add(player)
 
-    FPS = 30
+    FPS = 20
     clock = pygame.time.Clock()
 
     running = True
@@ -189,26 +211,24 @@ if __name__ == '__main__':
         elif keys[pygame.K_s]:
             all_sprites.update((0, 10))
 
-        if keys[pygame.K_e]:
+        if keys[pygame.K_e] and not keys[pygame.K_s] and not keys[pygame.K_w]:
             # Проверяем взаимодействие с дверью
             if player.rect.colliderect(current_room.get_door_sprite().rect):
                 # Переход в другую комнату
                 if current_room == bedroom:
                     current_room = living_room
                     all_sprites.empty()  # Очищаем группу спрайтов
-                    living_room.__init__(all_sprites)  # Инициализируем новую комнату
+                    living_room.__init__(all_sprites)
                     all_sprites.add(player)  # Добавляем игрока в новую комнату
-                    player.rect.center = (270, 220)  # Устанавливаем позицию игрока
+                    player.rect.center = (210, 470)  # Устанавливаем позицию игрока
                 else:
                     current_room = bedroom
                     all_sprites.empty()  # Очищаем группу спрайтов
-                    bedroom.__init__(all_sprites)  # Инициализируем новую комнату
+                    bedroom.__init__(all_sprites)
                     all_sprites.add(player)  # Добавляем игрока в новую комнату
-                    player.rect.center = (270, 220)  # Устанавливаем позицию игрока
+                    player.rect.center = (220, 160)  # Устанавливаем позицию игрока
 
-        all_sprites.update()
         all_sprites.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
-
     pygame.quit()
