@@ -22,38 +22,38 @@ def load_image(name, colorkey=None):
 
 class Board:
     def __init__(self, group):
+
         for i in range(400):
             if i == 0:
-                image = load_image(f"Slice 122.png")
+                image = load_image("Slice 122.png")
             elif 0 < i < 19:
-                image = load_image(f"Slice 124.png")
+                image = load_image("Slice 124.png")
             elif i == 19:
-                image = load_image(f"Slice 126.png")
+                image = load_image("Slice 126.png")
             elif i == 120:
-                image = load_image(f"Slice 128.png")
+                image = load_image("Slice 128.png")
             elif i == 380:
-                image = load_image(f"Slice 142.png")
+                image = load_image("Slice 142.png")
             elif i == 399:
-                image = load_image(f"Slice 146.png")
+                image = load_image("Slice 146.png")
             elif i % 10 == 9 and (i + 1) / 10 % 2 == 0 and 150 < i < 400:
-                image = load_image(f"Slice 136.png")
+                image = load_image("Slice 136.png")
             elif i / 10 % 2 == 0 and 120 < i < 400:
-                image = load_image(f"Slice 132.png")
+                image = load_image("Slice 132.png")
             elif i / 10 % 2 == 0:
-                image = load_image(f"Slice 133.png")
+                image = load_image("Slice 133.png")
             elif i == 139:
-                image = load_image(f"Slice 130.png")
+                image = load_image("Slice 130.png")
             elif i % 10 == 9 and (i + 1) / 10 % 2 == 0 and 20 < i < 140:
-                image = load_image(f"Slice 135.png")
+                image = load_image("Slice 135.png")
             elif i % 10 != 0 and 20 < i < 120:
-                image = load_image(f"Slice 129.png")
-            elif i % 10 != 0 and 120 < i < 140:
-                image = load_image(f"Slice 134.png")
+                image = load_image("Slice 129.png")
+            elif i % 10 != 0 and 120 < i < 140 and i != 130:
+                image = load_image("Slice 134.png")
             elif 380 < i < 399:
-                image = load_image(f"Slice 144.png")
+                image = load_image("Slice 144.png")
             elif i % 10 != 0 and 140 < i < 400:
-                image = load_image(f"Slice 1.png")
-
+                image = load_image("Slice 1.png")
             # Расположение по x;
             # (i // 10) столбец; * 24 расстояние между спрайтами в 24 пикселя (ширина одного спрайта); + 24 отступ
             x = (i % 20) * 24 + 24
@@ -65,6 +65,11 @@ class Board:
             sprite.image = image
             sprite.rect = sprite.image.get_rect(topleft=(x, y))
             group.add(sprite)
+        sprite = pygame.sprite.Sprite()
+        image = load_image('door.png')
+        sprite.image = image
+        sprite.rect = sprite.image.get_rect(topleft=(256, 100))
+        group.add(sprite)
 
 
 class Creature(pygame.sprite.Sprite):
