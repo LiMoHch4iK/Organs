@@ -144,6 +144,79 @@ class LivingRoom:
     def get_door_sprite(self):
         return self.door_sprite1
 
+    def get_door_sprite2(self):
+        return self.door_sprite2
+
+
+class Corridor:
+    def __init__(self, group):
+        for i in range(200):
+            if i == 0:  # левый верхний угол обоев (задняя стена)
+                image = load_image("Slice 61.png")
+            elif 0 < i < 9:  # верхний край стены (задняя стена)
+                image = load_image("Slice 63.png")
+            elif i == 9:  # правый верхний угол обоев (задняя стена)
+                image = load_image("Slice 65.png")
+            elif i == 60:  # правый нижний угол обоев (задняя стена)
+                image = load_image("Slice 67.png")
+            elif i == 190:  # левый нижний угол обоев (передняя стена)
+                image = load_image("Slice 81.png")
+            elif i == 199:  # правый нижний угол обоев (передняя стена)
+                image = load_image("Slice 85.png")
+            elif i == 69:  # правый нижний угол обоев (задняя стена)
+                image = load_image("Slice 69.png")
+            elif i % 10 == 0 and 9 < i < 70:  # левая стена рядом со стеной
+                image = load_image("Slice 72.png")
+            elif i % 10 == 9 and 10 < i < 70:  # правая стена рядом со стеной
+                image = load_image("Slice 74.png")
+            elif i % 10 != 0 and 60 < i < 70:  # нижний край стены (задняя стена)
+                image = load_image("Slice 73.png")
+            elif i % 10 != 0 and 10 < i < 70:  # общий тон задней стены
+                image = load_image("Slice 68.png")
+            elif i % 10 == 9 and 75 < i < 200:  # правая стена рядом с полом
+                image = load_image("Slice 75.png")
+            elif i % 10 == 0 and 59 < i < 200:  # левая стена рядом с полом
+                image = load_image("Slice 71.png")
+            elif i == 193:  # левый угол передней стены у двери
+                image = load_image("Slice 82.png")
+            elif 190 < i < 193 or 196 < i < 299:  # нижний край стены (передняя стена)
+                image = load_image("Slice 83.png")
+            elif i == 196:  # правый угол передней стены у двери
+                image = load_image("Slice 84.png")
+            elif i % 10 != 0 and 70 < i < 400:  # пол
+                image = load_image("Slice 1.png")
+            # Расположение по x;
+            # (i // 10) столбец; * 24 расстояние между спрайтами в 24 пикселя (ширина одного спрайта); + 24 отступ
+            x = (i % 10) * 24 + 24
+            # Расположение по y;
+            # (i // 10) строка; * 24 расстояние между спрайтами в 24 пикселя (ширина одного спрайта); + 24 отступ
+            y = (i // 10) * 24 + 24
+            # создание и добавление спрайта в группу
+            sprite = pygame.sprite.Sprite()
+            sprite.image = image
+            sprite.rect = sprite.image.get_rect(topleft=(x, y))
+            group.add(sprite)
+        # Прошлая дверь
+        self.door_sprite2 = pygame.sprite.Sprite()
+        image = load_image('Slice 4.png')
+        self.door_sprite2.image = image
+        self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(120, 480))
+        group.add(self.door_sprite2)
+        self.door_sprite2 = pygame.sprite.Sprite()
+        image = load_image('Slice 4.png')
+        self.door_sprite2.image = image
+        self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(144, 480))
+        group.add(self.door_sprite2)
+        # Новая дверь
+        self.door_sprite3 = pygame.sprite.Sprite()
+        image = load_image('door.png')
+        self.door_sprite3.image = image
+        self.door_sprite3.rect = self.door_sprite2.image.get_rect(topleft=(120, 100))
+        group.add(self.door_sprite3)
+
+    def get_door_sprite2(self):
+        return self.door_sprite2
+
 
 class Creature(pygame.sprite.Sprite):
     def __init__(self, *group):
@@ -155,13 +228,18 @@ class Creature(pygame.sprite.Sprite):
 
     def update(self, *args):
         if args:
-            if current_room == living_room and 170 < self.rect.x + args[0][0] < 205 and 400 < self.rect.y + args[0][
-                1] < 450:
-                if 170 < self.rect.x + args[0][0] < 205:
+            if current_room == living_room and 170 < self.rect.x + args[0][0] < 205 \
+                    and 400 < self.rect.y + args[0][1] < 450:
+                self.rect.x += args[0][0]
+                self.rect.y += args[0][1]
+            elif current_room == corridor:
+                if 100 < self.rect.x + args[0][0] < 135 and 400 < self.rect.y + args[0][1] < 450:
                     self.rect.x += args[0][0]
-                if 400 < self.rect.y + args[0][1] < 450:
                     self.rect.y += args[0][1]
-            else:
+                elif 30 < self.rect.x + args[0][0] < 200 and 135 < self.rect.y + args[0][1] < 425:
+                    self.rect.x += args[0][0]
+                    self.rect.y += args[0][1]
+            elif current_room != corridor:
                 if 30 < self.rect.x + args[0][0] < 436 and 135 < self.rect.y + args[0][1] < 425:
                     self.rect.x += args[0][0]
                     self.rect.y += args[0][1]
@@ -183,6 +261,7 @@ if __name__ == '__main__':
     all_sprites = pygame.sprite.Group()
 
     # Создайте спальню и гостиную
+    corridor = Corridor(all_sprites)
     living_room = LivingRoom(all_sprites)
     bedroom = Bedroom(all_sprites)
 
@@ -213,20 +292,36 @@ if __name__ == '__main__':
 
         if keys[pygame.K_e] and not keys[pygame.K_s] and not keys[pygame.K_w]:
             # Проверяем взаимодействие с дверью
-            if player.rect.colliderect(current_room.get_door_sprite().rect):
-                # Переход в другую комнату
-                if current_room == bedroom:
-                    current_room = living_room
-                    all_sprites.empty()  # Очищаем группу спрайтов
-                    living_room.__init__(all_sprites)
-                    all_sprites.add(player)  # Добавляем игрока в новую комнату
-                    player.rect.center = (210, 470)  # Устанавливаем позицию игрока
-                else:
-                    current_room = bedroom
-                    all_sprites.empty()  # Очищаем группу спрайтов
-                    bedroom.__init__(all_sprites)
-                    all_sprites.add(player)  # Добавляем игрока в новую комнату
-                    player.rect.center = (220, 160)  # Устанавливаем позицию игрока
+            if current_room == bedroom or current_room == living_room:
+                if player.rect.colliderect(current_room.get_door_sprite().rect):
+                    # Переход в другую комнату
+                    if current_room == bedroom:
+                        current_room = living_room
+                        all_sprites.empty()  # Очищаем группу спрайтов
+                        living_room.__init__(all_sprites)
+                        all_sprites.add(player)  # Добавляем игрока в новую комнату
+                        player.rect.center = (210, 470)  # Устанавливаем позицию игрока
+                    elif current_room == living_room:
+                        current_room = bedroom
+                        all_sprites.empty()  # Очищаем группу спрайтов
+                        bedroom.__init__(all_sprites)
+                        all_sprites.add(player)  # Добавляем игрока в новую комнату
+                        player.rect.center = (220, 160)  # Устанавливаем позицию игрока
+            if current_room == living_room or current_room == corridor:
+                if player.rect.colliderect(current_room.get_door_sprite2().rect):
+                    # Переход в другую комнату
+                    if current_room == corridor:
+                        current_room = living_room
+                        all_sprites.empty()  # Очищаем группу спрайтов
+                        living_room.__init__(all_sprites)
+                        all_sprites.add(player)  # Добавляем игрока в новую комнату
+                        player.rect.center = (275, 160)  # Устанавливаем позицию игрока
+                    elif current_room == living_room:
+                        current_room = corridor
+                        all_sprites.empty()  # Очищаем группу спрайтов
+                        corridor.__init__(all_sprites)
+                        all_sprites.add(player)  # Добавляем игрока в новую комнату
+                        player.rect.center = (140, 470)  # Устанавливаем позицию игрока
 
         all_sprites.draw(screen)
         pygame.display.flip()
