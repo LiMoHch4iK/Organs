@@ -187,7 +187,7 @@ class Corridor:
                 image = load_image("Slice 1.png")
             # Расположение по x;
             # (i // 10) столбец; * 24 расстояние между спрайтами в 24 пикселя (ширина одного спрайта); + 24 отступ
-            x = (i % 10) * 24 + 24
+            x = (i % 10) * 24 + 142
             # Расположение по y;
             # (i // 10) строка; * 24 расстояние между спрайтами в 24 пикселя (ширина одного спрайта); + 24 отступ
             y = (i // 10) * 24 + 24
@@ -200,18 +200,18 @@ class Corridor:
         self.door_sprite2 = pygame.sprite.Sprite()
         image = load_image('Slice 4.png')
         self.door_sprite2.image = image
-        self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(120, 480))
+        self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(238, 480))
         group.add(self.door_sprite2)
         self.door_sprite2 = pygame.sprite.Sprite()
         image = load_image('Slice 4.png')
         self.door_sprite2.image = image
-        self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(144, 480))
+        self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(262, 480))
         group.add(self.door_sprite2)
         # Новая дверь
         self.door_sprite3 = pygame.sprite.Sprite()
         image = load_image('door.png')
         self.door_sprite3.image = image
-        self.door_sprite3.rect = self.door_sprite2.image.get_rect(topleft=(120, 100))
+        self.door_sprite3.rect = self.door_sprite2.image.get_rect(topleft=(238, 100))
         group.add(self.door_sprite3)
 
     def get_door_sprite2(self):
@@ -233,10 +233,10 @@ class Creature(pygame.sprite.Sprite):
                 self.rect.x += args[0][0]
                 self.rect.y += args[0][1]
             elif current_room == corridor:
-                if 100 < self.rect.x + args[0][0] < 135 and 400 < self.rect.y + args[0][1] < 450:
+                if 218 < self.rect.x + args[0][0] < 253 and 400 < self.rect.y + args[0][1] < 450:
                     self.rect.x += args[0][0]
                     self.rect.y += args[0][1]
-                elif 30 < self.rect.x + args[0][0] < 200 and 135 < self.rect.y + args[0][1] < 425:
+                elif 148 < self.rect.x + args[0][0] < 318 and 135 < self.rect.y + args[0][1] < 425:
                     self.rect.x += args[0][0]
                     self.rect.y += args[0][1]
             elif current_room != corridor:
@@ -321,7 +321,7 @@ if __name__ == '__main__':
                         all_sprites.empty()  # Очищаем группу спрайтов
                         corridor.__init__(all_sprites)
                         all_sprites.add(player)  # Добавляем игрока в новую комнату
-                        player.rect.center = (140, 470)  # Устанавливаем позицию игрока
+                        player.rect.center = (258, 470)  # Устанавливаем позицию игрока
 
         all_sprites.draw(screen)
         pygame.display.flip()
