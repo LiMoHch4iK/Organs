@@ -78,7 +78,7 @@ class Bedroom:
 class LivingRoom:
     def __init__(self, group):
         for i in range(400):
-            if i == 0:  # левый верхний угол обоев (задняя стена)
+            if i == 0:  # левый верхний угол обоев (задняя стена)вц
                 image = load_image("Slice 61.png")
             elif 0 < i < 19:  # верхний край стены (задняя стена)
                 image = load_image("Slice 63.png")
@@ -260,10 +260,12 @@ if __name__ == '__main__':
 
     all_sprites = pygame.sprite.Group()
 
-    # Создайте спальню и гостиную
-    corridor = Corridor(all_sprites)
+    # Создайте спальню, гостиную, коридор
     living_room = LivingRoom(all_sprites)
     bedroom = Bedroom(all_sprites)
+    corridor = Corridor(all_sprites)
+
+    first_fl = True  # Отрисовка нужной комнаты при создании
 
     current_room = bedroom
     player = Creature()
@@ -280,7 +282,12 @@ if __name__ == '__main__':
 
         keys = pygame.key.get_pressed()
         screen.fill('black')
-
+        if first_fl:  # Отрисовка нужной комнаты при создании
+            all_sprites.empty()  # Очищаем группу спрайтов
+            bedroom.__init__(all_sprites)
+            all_sprites.add(player)  # Добавляем игрока в новую комнату
+            player.rect.center = (220, 180)  # Устанавливаем позицию игрока
+            first_fl = False
         if keys[pygame.K_a]:
             all_sprites.update((-10, 0))
         elif keys[pygame.K_d]:
