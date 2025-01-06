@@ -70,6 +70,55 @@ class Bedroom:
         self.door1_sprite.image = image
         self.door1_sprite.rect = self.door1_sprite.image.get_rect(topleft=(200, 100))
         group.add(self.door1_sprite)
+        self.furniture = set()
+        self.bed_sprite = pygame.sprite.Sprite()
+        image = load_image('bed.png')
+        self.bed_sprite.image = image
+        self.bed_sprite.rect = self.bed_sprite.image.get_rect(topleft=(330, 150))
+        group.add(self.bed_sprite)
+        self.furniture.add(self.bed_sprite)
+        self.paint_sprite = pygame.sprite.Sprite()
+        image = load_image('paint.png')
+        self.paint_sprite.image = image
+        self.paint_sprite.rect = self.paint_sprite.image.get_rect(topleft=(360, 45))
+        group.add(self.paint_sprite)
+        self.furniture.add(self.paint_sprite)
+        self.chest_sprite = pygame.sprite.Sprite()
+        image = load_image('chest.png')
+        self.chest_sprite.image = image
+        self.chest_sprite.rect = self.chest_sprite.image.get_rect(topleft=(275, 155))
+        group.add(self.chest_sprite)
+        self.furniture.add(self.chest_sprite)
+        self.table_sprite = pygame.sprite.Sprite()
+        image = load_image('table.png')
+        self.table_sprite.image = image
+        self.table_sprite.rect = self.table_sprite.image.get_rect(topleft=(415, 320))
+        group.add(self.table_sprite)
+        self.furniture.add(self.table_sprite)
+        self.chair_sprite = pygame.sprite.Sprite()
+        image = load_image('chair.png')
+        self.chair_sprite.image = image
+        self.chair_sprite.rect = self.chair_sprite.image.get_rect(topleft=(360, 350))
+        group.add(self.chair_sprite)
+        self.furniture.add(self.chair_sprite)
+        self.wardrobe_sprite = pygame.sprite.Sprite()
+        image = load_image('wardrobe.png')
+        self.wardrobe_sprite.image = image
+        self.wardrobe_sprite.rect = self.wardrobe_sprite.image.get_rect(topleft=(45, 80))
+        group.add(self.wardrobe_sprite)
+        self.furniture.add(self.wardrobe_sprite)
+        self.easel_sprite = pygame.sprite.Sprite()
+        image = load_image('easel.png')
+        self.easel_sprite.image = image
+        self.easel_sprite.rect = self.easel_sprite.image.get_rect(topleft=(80, 300))
+        group.add(self.easel_sprite)
+        self.furniture.add(self.easel_sprite)
+        self.chair1_sprite = pygame.sprite.Sprite()
+        image = load_image('chair1.png')
+        self.chair1_sprite.image = image
+        self.chair1_sprite.rect = self.chair1_sprite.image.get_rect(topleft=(85, 390))
+        group.add(self.chair1_sprite)
+        self.furniture.add(self.chair1_sprite)
 
     def get_door_sprite(self):
         return self.door1_sprite
