@@ -86,13 +86,13 @@ class Bedroom:
         self.chest_sprite = pygame.sprite.Sprite()
         image = load_image('chest.png')
         self.chest_sprite.image = image
-        self.chest_sprite.rect = self.chest_sprite.image.get_rect(topleft=(275, 155))
+        self.chest_sprite.rect = self.chest_sprite.image.get_rect(topleft=(275, 160))
         group.add(self.chest_sprite)
         self.furniture.add(self.chest_sprite)
         self.table_sprite = pygame.sprite.Sprite()
         image = load_image('table.png')
         self.table_sprite.image = image
-        self.table_sprite.rect = self.table_sprite.image.get_rect(topleft=(415, 320))
+        self.table_sprite.rect = self.table_sprite.image.get_rect(topleft=(415, 325))
         group.add(self.table_sprite)
         self.furniture.add(self.table_sprite)
         self.chair_sprite = pygame.sprite.Sprite()
@@ -388,13 +388,6 @@ class Creature(pygame.sprite.Sprite):
                 return False
         self.rect.topleft = original_position
         return True
-
-    def check_interaction_door(self, door_sprite):
-        # Проверяем, находится ли игрок рядом с дверью
-        # if комната
-        if self.rect.colliderect(door_sprite.rect):
-            return True
-        return False
 
 
 if __name__ == '__main__':
