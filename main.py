@@ -110,13 +110,13 @@ class Bedroom:
         self.easel_sprite = pygame.sprite.Sprite()
         image = load_image('easel.png')
         self.easel_sprite.image = image
-        self.easel_sprite.rect = self.easel_sprite.image.get_rect(topleft=(80, 300))
+        self.easel_sprite.rect = self.easel_sprite.image.get_rect(topleft=(90, 280))
         group.add(self.easel_sprite)
         self.furniture.add(self.easel_sprite)
         self.chair1_sprite = pygame.sprite.Sprite()
         image = load_image('chair1.png')
         self.chair1_sprite.image = image
-        self.chair1_sprite.rect = self.chair1_sprite.image.get_rect(topleft=(85, 390))
+        self.chair1_sprite.rect = self.chair1_sprite.image.get_rect(topleft=(95, 370))
         group.add(self.chair1_sprite)
         self.furniture.add(self.chair1_sprite)
 
@@ -189,6 +189,7 @@ class LivingRoom:
         self.door_sprite2.image = image
         self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(256, 100))
         group.add(self.door_sprite2)
+        self.furniture = set()
 
     def get_door_sprite(self):
         return self.door_sprite1
@@ -262,6 +263,7 @@ class Corridor:
         self.door_sprite3.image = image
         self.door_sprite3.rect = self.door_sprite3.image.get_rect(topleft=(238, 100))
         group.add(self.door_sprite3)
+        self.furniture = set()
 
     def get_door_sprite2(self):
         return self.door_sprite2
@@ -335,6 +337,7 @@ class Kitchen:
         self.door_sprite4.image = image
         self.door_sprite4.rect = self.door_sprite4.image.get_rect(topleft=(256, 100))
         group.add(self.door_sprite4)
+        self.furniture = set()
 
     def get_door_sprite3(self):
         return self.door_sprite3
@@ -350,28 +353,41 @@ class Creature(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 200
         self.rect.y = 200
+        self.mask = pygame.mask.from_surface(self.image)  # Создаем маску для игрока
 
     def update(self, *args):
         if args:
-            if current_room == living_room and 170 < self.rect.x + args[0][0] < 205 \
+            if current_room == living_room and 185 < self.rect.x + args[0][0] < 220 \
                     and 400 < self.rect.y + args[0][1] < 450:
                 self.rect.x += args[0][0]
                 self.rect.y += args[0][1]
             elif current_room == corridor:
-                if 218 < self.rect.x + args[0][0] < 253 and 400 < self.rect.y + args[0][1] < 450:
+                if 230 < self.rect.x + args[0][0] < 268 and 400 < self.rect.y + args[0][1] < 450:
                     self.rect.x += args[0][0]
                     self.rect.y += args[0][1]
-                elif 148 < self.rect.x + args[0][0] < 318 and 135 < self.rect.y + args[0][1] < 425:
+                elif 163 < self.rect.x + args[0][0] < 330 and 135 < self.rect.y + args[0][1] < 425:
                     self.rect.x += args[0][0]
                     self.rect.y += args[0][1]
-            elif current_room == kitchen and 170 < self.rect.x + args[0][0] < 205 \
+            elif current_room == kitchen and 185 < self.rect.x + args[0][0] < 220 \
                     and 400 < self.rect.y + args[0][1] < 450:
                 self.rect.x += args[0][0]
                 self.rect.y += args[0][1]
             elif current_room != corridor:
-                if 30 < self.rect.x + args[0][0] < 436 and 135 < self.rect.y + args[0][1] < 425:
+                if 45 < self.rect.x + args[0][0] < 451 and 135 < self.rect.y + args[0][1] < 425:
                     self.rect.x += args[0][0]
                     self.rect.y += args[0][1]
+
+    def main_update(self, furniture, *args):
+        # Проверка столкновения с мебелью по маске
+        original_position = self.rect.topleft
+        all_sprites.update(*args)
+        for item in furniture:
+            item_mask = pygame.mask.from_surface(item.image)  # Создаем маску для мебели
+            if pygame.sprite.collide_mask(self, item):
+                self.rect.topleft = original_position
+                return False
+        self.rect.topleft = original_position
+        return True
 
     def check_interaction_door(self, door_sprite):
         # Проверяем, находится ли игрок рядом с дверью
@@ -417,14 +433,21 @@ if __name__ == '__main__':
             all_sprites.add(player)  # Добавляем игрока в новую комнату
             player.rect.center = (220, 180)  # Устанавливаем позицию игрока
             first_fl = False
+
+            # Обработка клавиш
         if keys[pygame.K_a]:
-            all_sprites.update((-10, 0))
+            if player.main_update(current_room.furniture, (-10, 0)):
+                all_sprites.update((-10, 0))
         elif keys[pygame.K_d]:
-            all_sprites.update((10, 0))
+            if player.main_update(current_room.furniture, (10, 0)):
+                all_sprites.update((10, 0))
         elif keys[pygame.K_w]:
-            all_sprites.update((0, -10))
+            if player.main_update(current_room.furniture, (0, -10)):
+                all_sprites.update((0, -10))
         elif keys[pygame.K_s]:
-            all_sprites.update((0, 10))
+            if player.main_update(current_room.furniture, (0, 10)):
+                all_sprites.update((0, 10))
+
         if keys[pygame.K_e] and not keys[pygame.K_s] and not keys[pygame.K_w]:
             # Проверяем взаимодействие с дверью
             if current_room == bedroom or current_room == living_room:
