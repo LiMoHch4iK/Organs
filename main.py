@@ -417,6 +417,54 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    # Проверяем взаимодействие с дверью
+                    if current_room == bedroom or current_room == living_room:
+                        if player.rect.colliderect(current_room.get_door_sprite().rect):
+                            # Переход в другую комнату
+                            if current_room == bedroom:
+                                current_room = living_room
+                                all_sprites.empty()  # Очищаем группу спрайтов
+                                living_room.__init__(all_sprites)
+                                all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                player.rect.center = (210, 470)  # Устанавливаем позицию игрока
+                            elif current_room == living_room:
+                                current_room = bedroom
+                                all_sprites.empty()  # Очищаем группу спрайтов
+                                bedroom.__init__(all_sprites)
+                                all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                player.rect.center = (220, 160)  # Устанавливаем позицию игрока
+                    if current_room == living_room or current_room == corridor:
+                        if player.rect.colliderect(current_room.get_door_sprite2().rect):
+                            # Переход в другую комнату
+                            if current_room == corridor:
+                                current_room = living_room
+                                all_sprites.empty()  # Очищаем группу спрайтов
+                                living_room.__init__(all_sprites)
+                                all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                player.rect.center = (275, 160)  # Устанавливаем позицию игрока
+                            elif current_room == living_room:
+                                current_room = corridor
+                                all_sprites.empty()  # Очищаем группу спрайтов
+                                corridor.__init__(all_sprites)
+                                all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                player.rect.center = (258, 470)  # Устанавливаем позицию игрока
+                    if current_room == corridor or current_room == kitchen:
+                        if player.rect.colliderect(current_room.get_door_sprite3().rect):
+                            # Переход в другую комнату
+                            if current_room == corridor:
+                                current_room = kitchen
+                                all_sprites.empty()  # Очищаем группу спрайтов
+                                kitchen.__init__(all_sprites)
+                                all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                player.rect.center = (210, 470)  # Устанавливаем позицию игрока
+                            elif current_room == kitchen:
+                                current_room = corridor
+                                all_sprites.empty()  # Очищаем группу спрайтов
+                                corridor.__init__(all_sprites)
+                                all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                player.rect.center = (260, 160)  # Устанавливаем позицию игрока
 
         keys = pygame.key.get_pressed()
         screen.fill('black')
@@ -440,54 +488,6 @@ if __name__ == '__main__':
         elif keys[pygame.K_s]:
             if player.main_update(current_room.furniture, (0, 10)):
                 all_sprites.update((0, 10))
-
-        if keys[pygame.K_e] and not keys[pygame.K_s] and not keys[pygame.K_w]:
-            # Проверяем взаимодействие с дверью
-            if current_room == bedroom or current_room == living_room:
-                if player.rect.colliderect(current_room.get_door_sprite().rect):
-                    # Переход в другую комнату
-                    if current_room == bedroom:
-                        current_room = living_room
-                        all_sprites.empty()  # Очищаем группу спрайтов
-                        living_room.__init__(all_sprites)
-                        all_sprites.add(player)  # Добавляем игрока в новую комнату
-                        player.rect.center = (210, 470)  # Устанавливаем позицию игрока
-                    elif current_room == living_room:
-                        current_room = bedroom
-                        all_sprites.empty()  # Очищаем группу спрайтов
-                        bedroom.__init__(all_sprites)
-                        all_sprites.add(player)  # Добавляем игрока в новую комнату
-                        player.rect.center = (220, 160)  # Устанавливаем позицию игрока
-            if current_room == living_room or current_room == corridor:
-                if player.rect.colliderect(current_room.get_door_sprite2().rect):
-                    # Переход в другую комнату
-                    if current_room == corridor:
-                        current_room = living_room
-                        all_sprites.empty()  # Очищаем группу спрайтов
-                        living_room.__init__(all_sprites)
-                        all_sprites.add(player)  # Добавляем игрока в новую комнату
-                        player.rect.center = (275, 160)  # Устанавливаем позицию игрока
-                    elif current_room == living_room:
-                        current_room = corridor
-                        all_sprites.empty()  # Очищаем группу спрайтов
-                        corridor.__init__(all_sprites)
-                        all_sprites.add(player)  # Добавляем игрока в новую комнату
-                        player.rect.center = (258, 470)  # Устанавливаем позицию игрока
-            if current_room == corridor or current_room == kitchen:
-                if player.rect.colliderect(current_room.get_door_sprite3().rect):
-                    # Переход в другую комнату
-                    if current_room == corridor:
-                        current_room = kitchen
-                        all_sprites.empty()  # Очищаем группу спрайтов
-                        kitchen.__init__(all_sprites)
-                        all_sprites.add(player)  # Добавляем игрока в новую комнату
-                        player.rect.center = (210, 470)  # Устанавливаем позицию игрока
-                    elif current_room == kitchen:
-                        current_room = corridor
-                        all_sprites.empty()  # Очищаем группу спрайтов
-                        corridor.__init__(all_sprites)
-                        all_sprites.add(player)  # Добавляем игрока в новую комнату
-                        player.rect.center = (260, 160)  # Устанавливаем позицию игрока
 
         all_sprites.draw(screen)
         pygame.display.flip()
