@@ -190,6 +190,46 @@ class LivingRoom:
         self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(256, 100))
         group.add(self.door_sprite2)
         self.furniture = set()
+        self.sofa_sprite = pygame.sprite.Sprite()
+        image = load_image('sofa.png')
+        self.sofa_sprite.image = image
+        self.sofa_sprite.rect = self.sofa_sprite.image.get_rect(topleft=(48, 140))
+        group.add(self.sofa_sprite)
+        self.furniture.add(self.sofa_sprite)
+        self.TV = pygame.sprite.Sprite()
+        image = load_image('TV.png')
+        self.TV.image = image
+        self.TV.rect = self.TV.image.get_rect(topleft=(340, 100))
+        group.add(self.TV)
+        self.cushion1 = pygame.sprite.Sprite()
+        image = load_image('cushion.png')
+        self.cushion1.image = image
+        self.cushion1.rect = self.cushion1.image.get_rect(topleft=(340, 220))
+        group.add(self.cushion1)
+        self.furniture.add(self.cushion1)
+        self.cushion2 = pygame.sprite.Sprite()
+        image = load_image('cushion.png')
+        self.cushion2.image = image
+        self.cushion2.rect = self.cushion2.image.get_rect(topleft=(415, 235))
+        group.add(self.cushion2)
+        self.furniture.add(self.cushion2)
+        self.piano = pygame.sprite.Sprite()
+        image = load_image('piano.png')
+        self.piano.image = image
+        self.piano.rect = self.piano.image.get_rect(topleft=(320, 330))
+        group.add(self.piano)
+        self.furniture.add(self.piano)
+        self.table1 = pygame.sprite.Sprite()
+        image = load_image('table1.png')
+        self.table1.image = image
+        self.table1.rect = self.table1.image.get_rect(topleft=(53, 210))
+        group.add(self.table1)
+        self.furniture.add(self.table1)
+        self.picture = pygame.sprite.Sprite()
+        image = load_image('picture1.png')
+        self.picture.image = image
+        self.picture.rect = self.picture.image.get_rect(topleft=(80, 70))
+        group.add(self.picture)
 
     def get_door_sprite(self):
         return self.door_sprite1
