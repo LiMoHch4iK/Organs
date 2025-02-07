@@ -1,7 +1,119 @@
 import os
+import sqlite3
 import sys
 
 import pygame
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QRadioButton, QMenuBar, QStatusBar, QPushButton, \
+    QApplication
+
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setFixedSize(700, 340)  # Устанавливаем фиксированный размер окна
+        self.setWindowTitle("Тест")
+
+        self.centralwidget = QWidget(self)
+        self.setCentralWidget(self.centralwidget)
+
+        self.layout = QVBoxLayout(self.centralwidget)
+
+        self.question = QLabel("TextLabel", self)
+        self.layout.addWidget(self.question)
+
+        self.variant1 = QRadioButton("RadioButton", self)
+        self.variant2 = QRadioButton("RadioButton", self)
+        self.variant3 = QRadioButton("RadioButton", self)
+        self.variant4 = QRadioButton("RadioButton", self)
+        self.layout.addWidget(self.variant1)
+        self.layout.addWidget(self.variant2)
+        self.layout.addWidget(self.variant3)
+        self.layout.addWidget(self.variant4)
+
+        self.pushButton = QPushButton("Проверить", self)
+        self.layout.addWidget(self.pushButton)
+
+        self.label_result = QLabel("", self)  # Лейбл для отображения результата
+        self.layout.addWidget(self.label_result)
+
+        self.label_errors = QLabel("Ошибки: 0", self)  # Лейбл для отображения ошибок
+        self.layout.addWidget(self.label_errors)
+
+        self.menubar = QMenuBar(self)
+        self.setMenuBar(self.menubar)
+
+        self.statusbar = QStatusBar(self)
+        self.setStatusBar(self.statusbar)
+
+        self.current_question_index = 0  # Индекс текущего вопроса
+        self.total_questions = 5  # Число вопросов в базе
+        self.errors_count = 0  # Количество ошибок
+        self.test_passed = False  # Статус прохождения теста
+        self.load_question()
+
+        self.pushButton.clicked.connect(self.check_answer)
+
+    def load_question(self):
+        con = sqlite3.connect('organs_test.sqlite')
+        cur = con.cursor()
+        question = cur.execute("""
+        SELECT question FROM test 
+        WHERE id = ? """, (self.current_question_index + 1,)).fetchone()
+        self.question.setText(question[0])
+
+        variants = cur.execute("""
+        SELECT variant FROM variants 
+        WHERE id =(SELECT variants FROM test 
+        WHERE id = ?)""", (self.current_question_index + 1,)).fetchone()
+        variants = variants[0].split(',')
+
+        self.variant1.setText(variants[0].split(',')[0])
+        self.variant2.setText(variants[1].split(',')[0])
+        self.variant3.setText(variants[2].split(',')[0])
+        self.variant4.setText(variants[3].split(',')[0])
+
+        con.close()
+
+    def check_answer(self):
+        con = sqlite3.connect('organs_test.sqlite')
+        cur = con.cursor()
+
+        if self.variant1.isChecked():
+            answer = self.variant1.text()
+        elif self.variant2.isChecked():
+            answer = self.variant2.text()
+        elif self.variant3.isChecked():
+            answer = self.variant3.text()
+        elif self.variant4.isChecked():
+            answer = self.variant4.text()
+        else:
+            answer = ''
+
+        right_answer = cur.execute("""
+                   SELECT answer FROM test 
+                   WHERE id = ? """, (self.current_question_index + 1,)).fetchone()
+        con.close()
+
+        if right_answer[0] == answer:
+            self.label_result.setText('Верно')
+        else:
+            self.label_result.setText('Неверно')
+            self.errors_count += 1
+            self.label_errors.setText(f"Ошибки: {self.errors_count}")
+
+        self.current_question_index += 1  # Переходим к следующему вопросу
+        if self.current_question_index < self.total_questions:
+            self.load_question()
+        else:
+            self.pushButton.setEnabled(False)  # Отключаем кнопку, если тест завершен
+            if self.errors_count != 0:
+                self.label_result.setText(
+                    'Тест завершен! Проход в следующую комнату закрыт. Возвращайтесь когда выучите тему!')
+            else:
+                self.label_result.setText(
+                    'Тест завершен! Проходите в следующую комнату и найдите орган.')
+                self.test_passed = True  # Успешное прохождение теста
 
 
 def load_image(name, colorkey=None):
@@ -449,6 +561,8 @@ if __name__ == '__main__':
     player = Creature()
     all_sprites.add(player)
 
+    app = QApplication(sys.argv)
+
     FPS = 20
     clock = pygame.time.Clock()
 
@@ -464,72 +578,74 @@ if __name__ == '__main__':
                         if player.rect.colliderect(current_room.get_door_sprite().rect):
                             # Переход в другую комнату
                             if current_room == bedroom:
+                                window = MainWindow()
+                                window.show()
                                 current_room = living_room
                                 all_sprites.empty()  # Очищаем группу спрайтов
                                 living_room.__init__(all_sprites)
                                 all_sprites.add(player)  # Добавляем игрока в новую комнату
                                 player.rect.center = (210, 470)  # Устанавливаем позицию игрока
-                            elif current_room == living_room:
-                                current_room = bedroom
-                                all_sprites.empty()  # Очищаем группу спрайтов
-                                bedroom.__init__(all_sprites)
-                                all_sprites.add(player)  # Добавляем игрока в новую комнату
-                                player.rect.center = (220, 160)  # Устанавливаем позицию игрока
-                    if current_room == living_room or current_room == corridor:
-                        if player.rect.colliderect(current_room.get_door_sprite2().rect):
-                            # Переход в другую комнату
-                            if current_room == corridor:
-                                current_room = living_room
-                                all_sprites.empty()  # Очищаем группу спрайтов
-                                living_room.__init__(all_sprites)
-                                all_sprites.add(player)  # Добавляем игрока в новую комнату
-                                player.rect.center = (275, 160)  # Устанавливаем позицию игрока
-                            elif current_room == living_room:
-                                current_room = corridor
-                                all_sprites.empty()  # Очищаем группу спрайтов
-                                corridor.__init__(all_sprites)
-                                all_sprites.add(player)  # Добавляем игрока в новую комнату
-                                player.rect.center = (258, 470)  # Устанавливаем позицию игрока
-                    if current_room == corridor or current_room == kitchen:
-                        if player.rect.colliderect(current_room.get_door_sprite3().rect):
-                            # Переход в другую комнату
-                            if current_room == corridor:
-                                current_room = kitchen
-                                all_sprites.empty()  # Очищаем группу спрайтов
-                                kitchen.__init__(all_sprites)
-                                all_sprites.add(player)  # Добавляем игрока в новую комнату
-                                player.rect.center = (210, 470)  # Устанавливаем позицию игрока
-                            elif current_room == kitchen:
-                                current_room = corridor
-                                all_sprites.empty()  # Очищаем группу спрайтов
-                                corridor.__init__(all_sprites)
-                                all_sprites.add(player)  # Добавляем игрока в новую комнату
-                                player.rect.center = (260, 160)  # Устанавливаем позицию игрока
+                        elif current_room == living_room:
+                            current_room = bedroom
+                            all_sprites.empty()  # Очищаем группу спрайтов
+                            bedroom.__init__(all_sprites)
+                            all_sprites.add(player)  # Добавляем игрока в новую комнату
+                            player.rect.center = (220, 160)  # Устанавливаем позицию игрока
+                if current_room == living_room or current_room == corridor:
+                    if player.rect.colliderect(current_room.get_door_sprite2().rect):
+                        # Переход в другую комнату
+                        if current_room == corridor:
+                            current_room = living_room
+                            all_sprites.empty()  # Очищаем группу спрайтов
+                            living_room.__init__(all_sprites)
+                            all_sprites.add(player)  # Добавляем игрока в новую комнату
+                            player.rect.center = (275, 160)  # Устанавливаем позицию игрока
+                        elif current_room == living_room:
+                            current_room = corridor
+                            all_sprites.empty()  # Очищаем группу спрайтов
+                            corridor.__init__(all_sprites)
+                            all_sprites.add(player)  # Добавляем игрока в новую комнату
+                            player.rect.center = (258, 470)  # Устанавливаем позицию игрока
+                if current_room == corridor or current_room == kitchen:
+                    if player.rect.colliderect(current_room.get_door_sprite3().rect):
+                        # Переход в другую комнату
+                        if current_room == corridor:
+                            current_room = kitchen
+                            all_sprites.empty()  # Очищаем группу спрайтов
+                            kitchen.__init__(all_sprites)
+                            all_sprites.add(player)  # Добавляем игрока в новую комнату
+                            player.rect.center = (210, 470)  # Устанавливаем позицию игрока
+                        elif current_room == kitchen:
+                            current_room = corridor
+                            all_sprites.empty()  # Очищаем группу спрайтов
+                            corridor.__init__(all_sprites)
+                            all_sprites.add(player)  # Добавляем игрока в новую комнату
+                            player.rect.center = (260, 160)  # Устанавливаем позицию игрока
 
-        keys = pygame.key.get_pressed()
-        screen.fill('black')
-        if first_fl:  # Отрисовка нужной комнаты при создании
-            all_sprites.empty()  # Очищаем группу спрайтов
-            bedroom.__init__(all_sprites)
-            all_sprites.add(player)  # Добавляем игрока в новую комнату
-            player.rect.center = (220, 180)  # Устанавливаем позицию игрока
-            first_fl = False
+    keys = pygame.key.get_pressed()
+    screen.fill('black')
+    if first_fl:  # Отрисовка нужной комнаты при создании
+        all_sprites.empty()  # Очищаем группу спрайтов
+        bedroom.__init__(all_sprites)
+        all_sprites.add(player)  # Добавляем игрока в новую комнату
+        player.rect.center = (220, 180)  # Устанавливаем позицию игрока
+        first_fl = False
 
-            # Обработка клавиш
-        if keys[pygame.K_a]:
-            if player.main_update(current_room.furniture, (-10, 0)):
-                all_sprites.update((-10, 0))
-        elif keys[pygame.K_d]:
-            if player.main_update(current_room.furniture, (10, 0)):
-                all_sprites.update((10, 0))
-        elif keys[pygame.K_w]:
-            if player.main_update(current_room.furniture, (0, -10)):
-                all_sprites.update((0, -10))
-        elif keys[pygame.K_s]:
-            if player.main_update(current_room.furniture, (0, 10)):
-                all_sprites.update((0, 10))
+        # Обработка клавиш
+    if keys[pygame.K_a]:
+        if player.main_update(current_room.furniture, (-10, 0)):
+            all_sprites.update((-10, 0))
+    elif keys[pygame.K_d]:
+        if player.main_update(current_room.furniture, (10, 0)):
+            all_sprites.update((10, 0))
+    elif keys[pygame.K_w]:
+        if player.main_update(current_room.furniture, (0, -10)):
+            all_sprites.update((0, -10))
+    elif keys[pygame.K_s]:
+        if player.main_update(current_room.furniture, (0, 10)):
+            all_sprites.update((0, 10))
 
-        all_sprites.draw(screen)
-        pygame.display.flip()
-        clock.tick(FPS)
-    pygame.quit()
+    all_sprites.draw(screen)
+    pygame.display.flip()
+    clock.tick(FPS)
+pygame.quit()
