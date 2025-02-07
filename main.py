@@ -47,9 +47,10 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.statusbar)
         if current_room_for_test == ['bedroom']:
             self.current_question_index = 0  # Индекс текущего вопроса
+            self.total_questions = 5  # Число вопросов в базе
         elif current_room_for_test == ['living_room']:
-            self.current_question_index = 6  # Индекс текущего вопроса
-        self.total_questions = 5  # Число вопросов в базе
+            self.current_question_index = 5  # Индекс текущего вопроса
+            self.total_questions = 10  # Число вопросов в базе
         self.errors_count = 0  # Количество ошибок
         self.load_question()
 
@@ -119,7 +120,15 @@ class MainWindow(QMainWindow):
                     all_sprites.empty()  # Очищаем группу спрайтов
                     living_room.__init__(all_sprites)
                     all_sprites.add(player)  # Добавляем игрока в новую комнату
-                    player.rect.center = (210, 470)  # Устанавливаем позицию игрок
+                    player.rect.center = (210, 470)  # Устанавливаем позицию игрока
+                if current_room == living_room:
+                    current_room_for_test.clear()
+                    current_room_for_test.append('corridor')
+                    finish_test.append('living_room')
+                    all_sprites.empty()  # Очищаем группу спрайтов
+                    corridor.__init__(all_sprites)
+                    all_sprites.add(player)  # Добавляем игрока в новую комнату
+                    player.rect.center = (258, 470)  # Устанавливаем позицию игрока
 
 
 
@@ -578,7 +587,7 @@ if __name__ == '__main__':
     while running:
         if current_room_for_test == ['living_room'] and current_room == bedroom:
             current_room = living_room
-        if current_room_for_test == ['corridor']:
+        if current_room_for_test == ['corridor'] and current_room == living_room:
             current_room = corridor
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -611,13 +620,15 @@ if __name__ == '__main__':
                         if player.rect.colliderect(current_room.get_door_sprite2().rect):
                             # Переход в другую комнату
                             if current_room == corridor:
+                                current_room_for_test.clear()
                                 current_room = living_room
                                 all_sprites.empty()  # Очищаем группу спрайтов
                                 living_room.__init__(all_sprites)
                                 all_sprites.add(player)  # Добавляем игрока в новую комнату
                                 player.rect.center = (275, 160)  # Устанавливаем позицию игрока
                             elif current_room == living_room:
-                                if 'corridor' not in finish_test:
+                                if 'living_room' not in finish_test:
+                                    current_room_for_test = ['living_room']
                                     window = MainWindow()
                                     window.show()
                                 else:
@@ -637,6 +648,7 @@ if __name__ == '__main__':
                                 all_sprites.add(player)  # Добавляем игрока в новую комнату
                                 player.rect.center = (210, 470)  # Устанавливаем позицию игрока
                             elif current_room == kitchen:
+                                current_room_for_test.clear()
                                 current_room = corridor
                                 all_sprites.empty()  # Очищаем группу спрайтов
                                 corridor.__init__(all_sprites)
