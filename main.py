@@ -131,7 +131,6 @@ class MainWindow(QMainWindow):
                     player.rect.center = (258, 470)  # Устанавливаем позицию игрока
 
 
-
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
@@ -318,6 +317,13 @@ class LivingRoom:
         self.door_sprite2.rect = self.door_sprite2.image.get_rect(topleft=(256, 100))
         group.add(self.door_sprite2)
         self.furniture = set()
+        if not eyes_fl:
+            self.eyes = pygame.sprite.Sprite()
+            image = load_image('eyes.png')
+            self.eyes.image = image
+            self.eyes.rect = self.eyes.image.get_rect(topleft=(100, 390))
+            group.add(self.eyes)
+            self.furniture.add(self.eyes)
         self.sofa_sprite = pygame.sprite.Sprite()
         image = load_image('sofa.png')
         self.sofa_sprite.image = image
@@ -364,6 +370,9 @@ class LivingRoom:
 
     def get_door_sprite2(self):
         return self.door_sprite2
+
+    def get_eyes(self):
+        return self.eyes
 
 
 class Corridor:
@@ -564,6 +573,8 @@ if __name__ == '__main__':
     size = width, height = 524, 524
     screen = pygame.display.set_mode(size)
 
+    eyes_fl = False
+
     all_sprites = pygame.sprite.Group()
 
     # Создайте спальню, гостиную, коридор
@@ -617,6 +628,11 @@ if __name__ == '__main__':
                                 all_sprites.add(player)  # Добавляем игрока в новую комнату
                                 player.rect.center = (220, 160)  # Устанавливаем позицию игрока
                     if current_room == living_room or current_room == corridor:
+                        if current_room == living_room:
+                            if player.rect.colliderect(current_room.get_eyes().rect):
+                                if not eyes_fl:
+                                    pass
+                                    # eyes_fl = False
                         if player.rect.colliderect(current_room.get_door_sprite2().rect):
                             # Переход в другую комнату
                             if current_room == corridor:
