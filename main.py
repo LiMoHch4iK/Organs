@@ -45,8 +45,10 @@ class MainWindow(QMainWindow):
 
         self.statusbar = QStatusBar(self)
         self.setStatusBar(self.statusbar)
-
-        self.current_question_index = 0  # Индекс текущего вопроса
+        if current_room_for_test == ['bedroom']:
+            self.current_question_index = 0  # Индекс текущего вопроса
+        elif current_room_for_test == ['living_room']:
+            self.current_question_index = 6  # Индекс текущего вопроса
         self.total_questions = 5  # Число вопросов в базе
         self.errors_count = 0  # Количество ошибок
         self.load_question()
@@ -65,8 +67,7 @@ class MainWindow(QMainWindow):
         SELECT variant FROM variants 
         WHERE id =(SELECT variants FROM test 
         WHERE id = ?)""", (self.current_question_index + 1,)).fetchone()
-        variants = variants[0].split(',')
-
+        variants = variants[0].split(', ')
         self.variant1.setText(variants[0].split(',')[0])
         self.variant2.setText(variants[1].split(',')[0])
         self.variant3.setText(variants[2].split(',')[0])
@@ -93,7 +94,6 @@ class MainWindow(QMainWindow):
                    SELECT answer FROM test 
                    WHERE id = ? """, (self.current_question_index + 1,)).fetchone()
         con.close()
-
         if right_answer[0] == answer:
             self.label_result.setText('Верно')
         else:
@@ -112,7 +112,15 @@ class MainWindow(QMainWindow):
             else:
                 self.label_result.setText(
                     'Тест завершен! Проходите в следующую комнату и найдите орган.')
-                test_finish.append(True)  # Успешное прохождение теста
+                if current_room == bedroom:
+                    current_room_for_test.clear()
+                    current_room_for_test.append('living_room')
+                    finish_test.append('bedroom')
+                    all_sprites.empty()  # Очищаем группу спрайтов
+                    living_room.__init__(all_sprites)
+                    all_sprites.add(player)  # Добавляем игрока в новую комнату
+                    player.rect.center = (210, 470)  # Устанавливаем позицию игрок
+
 
 
 def load_image(name, colorkey=None):
@@ -557,8 +565,9 @@ if __name__ == '__main__':
     first_fl = True  # Отрисовка нужной комнаты при создании
 
     current_room = bedroom
-    player = Creature()
-    all_sprites.add(player)
+    current_room_for_test = ['bedroom']
+    finish_test = []
+    player = Creature(all_sprites)
 
     app = QApplication(sys.argv)
 
@@ -567,6 +576,10 @@ if __name__ == '__main__':
 
     running = True
     while running:
+        if current_room_for_test == ['living_room'] and current_room == bedroom:
+            current_room = living_room
+        if current_room_for_test == ['corridor']:
+            current_room = corridor
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -577,16 +590,18 @@ if __name__ == '__main__':
                         if player.rect.colliderect(current_room.get_door_sprite().rect):
                             # Переход в другую комнату
                             if current_room == bedroom:
-                                test_finish = []
-                                window = MainWindow()
-                                window.show()
-                                if test_finish:
+                                if 'bedroom' not in finish_test:
+                                    window = MainWindow()
+                                    window.show()
+                                else:
+                                    current_room_for_test.clear()
                                     current_room = living_room
                                     all_sprites.empty()  # Очищаем группу спрайтов
                                     living_room.__init__(all_sprites)
                                     all_sprites.add(player)  # Добавляем игрока в новую комнату
-                                    player.rect.center = (210, 470)  # Устанавливаем позицию игрока
+                                    player.rect.center = (210, 470)  # Устанавливаем позицию игрок
                             elif current_room == living_room:
+                                current_room_for_test.clear()
                                 current_room = bedroom
                                 all_sprites.empty()  # Очищаем группу спрайтов
                                 bedroom.__init__(all_sprites)
@@ -602,11 +617,16 @@ if __name__ == '__main__':
                                 all_sprites.add(player)  # Добавляем игрока в новую комнату
                                 player.rect.center = (275, 160)  # Устанавливаем позицию игрока
                             elif current_room == living_room:
-                                current_room = corridor
-                                all_sprites.empty()  # Очищаем группу спрайтов
-                                corridor.__init__(all_sprites)
-                                all_sprites.add(player)  # Добавляем игрока в новую комнату
-                                player.rect.center = (258, 470)  # Устанавливаем позицию игрока
+                                if 'corridor' not in finish_test:
+                                    window = MainWindow()
+                                    window.show()
+                                else:
+                                    current_room_for_test.clear()
+                                    current_room = corridor
+                                    all_sprites.empty()  # Очищаем группу спрайтов
+                                    corridor.__init__(all_sprites)
+                                    all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                    player.rect.center = (258, 470)  # Устанавливаем позицию игрока
                     if current_room == corridor or current_room == kitchen:
                         if player.rect.colliderect(current_room.get_door_sprite3().rect):
                             # Переход в другую комнату
