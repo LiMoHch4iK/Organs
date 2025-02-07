@@ -1,10 +1,11 @@
 import os
 import sqlite3
-import sys
 
 import pygame
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QRadioButton, QMenuBar, QStatusBar, QPushButton, \
     QApplication
+
+from start_screen import *
 
 
 class MainWindow(QMainWindow):
@@ -222,6 +223,12 @@ class Bedroom:
         self.table_sprite.rect = self.table_sprite.image.get_rect(topleft=(415, 325))
         group.add(self.table_sprite)
         self.furniture.add(self.table_sprite)
+        self.book = pygame.sprite.Sprite()
+        image = load_image('book.png')
+        self.book.image = image
+        self.book.rect = self.book.image.get_rect(topleft=(420, 330))
+        group.add(self.book)
+        self.furniture.add(self.book)
         self.chair_sprite = pygame.sprite.Sprite()
         image = load_image('chair.png')
         self.chair_sprite.image = image
@@ -573,10 +580,11 @@ if __name__ == '__main__':
     size = width, height = 524, 524
     screen = pygame.display.set_mode(size)
 
+    start_screen(screen)
+
     eyes_fl = False
 
     all_sprites = pygame.sprite.Group()
-
     # Создайте спальню, гостиную, коридор
     living_room = LivingRoom(all_sprites)
     bedroom = Bedroom(all_sprites)
