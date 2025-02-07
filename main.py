@@ -49,7 +49,6 @@ class MainWindow(QMainWindow):
         self.current_question_index = 0  # Индекс текущего вопроса
         self.total_questions = 5  # Число вопросов в базе
         self.errors_count = 0  # Количество ошибок
-        self.test_passed = False  # Статус прохождения теста
         self.load_question()
 
         self.pushButton.clicked.connect(self.check_answer)
@@ -113,7 +112,7 @@ class MainWindow(QMainWindow):
             else:
                 self.label_result.setText(
                     'Тест завершен! Проходите в следующую комнату и найдите орган.')
-                self.test_passed = True  # Успешное прохождение теста
+                test_finish.append(True)  # Успешное прохождение теста
 
 
 def load_image(name, colorkey=None):
@@ -578,13 +577,15 @@ if __name__ == '__main__':
                         if player.rect.colliderect(current_room.get_door_sprite().rect):
                             # Переход в другую комнату
                             if current_room == bedroom:
+                                test_finish = []
                                 window = MainWindow()
                                 window.show()
-                                current_room = living_room
-                                all_sprites.empty()  # Очищаем группу спрайтов
-                                living_room.__init__(all_sprites)
-                                all_sprites.add(player)  # Добавляем игрока в новую комнату
-                                player.rect.center = (210, 470)  # Устанавливаем позицию игрока
+                                if test_finish:
+                                    current_room = living_room
+                                    all_sprites.empty()  # Очищаем группу спрайтов
+                                    living_room.__init__(all_sprites)
+                                    all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                    player.rect.center = (210, 470)  # Устанавливаем позицию игрока
                             elif current_room == living_room:
                                 current_room = bedroom
                                 all_sprites.empty()  # Очищаем группу спрайтов
