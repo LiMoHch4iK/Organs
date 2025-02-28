@@ -1,14 +1,13 @@
 import os
 import sqlite3
 
-import pygame
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QRadioButton, QMenuBar, QStatusBar, QPushButton, \
     QApplication
 
 from start_screen import *
 
 
-class MainWindow(QMainWindow):
+class Test(QMainWindow):
     def __init__(self):
         super().__init__()
 
@@ -228,7 +227,6 @@ class Bedroom:
         self.book.image = image
         self.book.rect = self.book.image.get_rect(topleft=(420, 330))
         group.add(self.book)
-        self.furniture.add(self.book)
         self.chair_sprite = pygame.sprite.Sprite()
         image = load_image('chair.png')
         self.chair_sprite.image = image
@@ -256,6 +254,9 @@ class Bedroom:
 
     def get_door_sprite(self):
         return self.door1_sprite
+
+    def get_book_sprite(self):
+        return self.book
 
 
 class LivingRoom:
@@ -448,6 +449,16 @@ class Corridor:
         self.door_sprite3.rect = self.door_sprite3.image.get_rect(topleft=(238, 100))
         group.add(self.door_sprite3)
         self.furniture = set()
+        if not lungs:
+            self.lungs = pygame.sprite.Sprite()
+            image = load_image('eyes.png')
+            self.lungs.image = image
+            self.lungs.rect = self.lungs.image.get_rect(topleft=(300, 200))
+            group.add(self.lungs)
+            self.furniture.add(self.lungs)
+
+    def get_lungs(self):
+        return self.lungs
 
     def get_door_sprite2(self):
         return self.door_sprite2
@@ -583,6 +594,7 @@ if __name__ == '__main__':
     start_screen(screen)
 
     eyes_fl = False
+    lungs = False
 
     all_sprites = pygame.sprite.Group()
     # Создайте спальню, гостиную, коридор
@@ -615,11 +627,15 @@ if __name__ == '__main__':
                 if event.key == pygame.K_e:
                     # Проверяем взаимодействие с дверью
                     if current_room == bedroom or current_room == living_room:
+                        if current_room == bedroom:
+                            # rect_book = (420, 330, 40, 35), но нужно сделать прибавку так как книга лежит на столе
+                            if player.rect.colliderect((400, 330, 60, 35)):
+                                pass  # тут будет текст книги
                         if player.rect.colliderect(current_room.get_door_sprite().rect):
                             # Переход в другую комнату
                             if current_room == bedroom:
                                 if 'bedroom' not in finish_test:
-                                    window = MainWindow()
+                                    window = Test()
                                     window.show()
                                 else:
                                     current_room_for_test.clear()
@@ -637,10 +653,21 @@ if __name__ == '__main__':
                                 player.rect.center = (220, 160)  # Устанавливаем позицию игрока
                     if current_room == living_room or current_room == corridor:
                         if current_room == living_room:
-                            if player.rect.colliderect(current_room.get_eyes().rect):
-                                if not eyes_fl:
-                                    pass
-                                    # eyes_fl = False
+                            if not eyes_fl:
+                                if player.rect.colliderect(living_room.get_eyes().rect):
+                                    eyes_fl = True
+                                    all_sprites.empty()  # Очищаем группу спрайтов
+                                    living_room.__init__(all_sprites)
+                                    all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                    player.rect.move(player.rect.topleft)  # Устанавливаем позицию игрока
+                        elif current_room == corridor:
+                            if not lungs:
+                                if player.rect.colliderect(corridor.get_lungs().rect):
+                                    lungs = True
+                                    all_sprites.empty()  # Очищаем группу спрайтов
+                                    corridor.__init__(all_sprites)
+                                    all_sprites.add(player)  # Добавляем игрока в новую комнату
+                                    player.rect.move(player.rect.topleft)  # Устанавливаем позицию игрока
                         if player.rect.colliderect(current_room.get_door_sprite2().rect):
                             # Переход в другую комнату
                             if current_room == corridor:
@@ -653,7 +680,7 @@ if __name__ == '__main__':
                             elif current_room == living_room:
                                 if 'living_room' not in finish_test:
                                     current_room_for_test = ['living_room']
-                                    window = MainWindow()
+                                    window = Test()
                                     window.show()
                                 else:
                                     current_room_for_test.clear()
